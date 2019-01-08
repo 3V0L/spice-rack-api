@@ -1,0 +1,38 @@
+{
+  "name": "spice_rack",
+  "version": "1.0.0",
+  "description": "An API for managing one's recipes as well as finding recipes that other users post to the public",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "DEBUG=app nodemon server.js",
+    "lint": "npx eslint --ignore-path .gitignore .",
+    "lint-fix": "npx eslint --ignore-path .gitignore . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/3V0L/spice-rack.git"
+  },
+  "author": "Tapiwa Lason Mapfundematsva",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/3V0L/spice-rack/issues"
+  },
+  "homepage": "https://github.com/3V0L/spice-rack#readme",
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "chalk": "2.4.1",
+    "debug": "4.1.1",
+    "dotenv": "6.2.0",
+    "express": "4.16.4",
+    "mongoose": "5.4.2",
+    "morgan": "1.9.1"
+  },
+  "devDependencies": {
+    "eslint": "5.11.1",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "nodemon": "1.18.9"
+  }
+}
