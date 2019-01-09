@@ -6,9 +6,9 @@ const recipeSchema = mongoose.Schema({
     type: String,
     required: [true, 'Title is required'],
   },
-  ingridients: {
+  ingredients: {
     type: String,
-    required: [true, 'Ingridients are required'],
+    required: [true, 'Ingredients are required'],
   },
   time: {
     type: Number,

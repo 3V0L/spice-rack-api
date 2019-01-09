@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const url = require('url');
 
 const RecipeModel = require('../models/recipes');
 
@@ -7,10 +8,15 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   RecipeModel.find()
+    .select('_id title ingredients time')
     .exec()
     .then((recipes) => {
       if (recipes.length > 0) {
-        res.status(200).json(recipes);
+        const response = {
+          totalCount: recipes.length,
+          recipes,
+        };
+        res.status(200).json(response);
       } else {
         res.status(200).json({ message: 'No recipes available.' });
       }
@@ -24,13 +30,18 @@ router.post('/', (req, res) => {
   const recipe = new RecipeModel({
     _id: new mongoose.Types.ObjectId(),
     title: req.body.title,
-    ingridients: req.body.ingridients,
+    ingredients: req.body.ingredients,
     time: req.body.time,
   });
   recipe.save().then((result) => {
     res.status(201).json({
       message: 'Recipe Created',
-      createdRecipe: result,
+      createdRecipe: {
+        _id: result.id,
+        title: result.title,
+        ingredients: result.ingredients,
+        time: result.time,
+      },
     });
   })
     .catch((error) => {
@@ -44,6 +55,7 @@ router.post('/', (req, res) => {
 
 router.get('/:recipeId', (req, res) => {
   RecipeModel.findById(req.params.recipeId)
+    .select('_id title ingredients time')
     .exec()
     .then((record) => {
       if (record) {
@@ -67,7 +79,21 @@ router.patch('/:recipeId', (req, res) => {
   )
     .exec()
     .then(() => {
-      res.status(200).json({ message: 'Recipe Updated.' });
+      // Generate URL for getting the Patched record
+      const requrl = url.format({
+        protocol: req.protocol,
+        host: req.get('host'),
+        pathname: req.originalUrl,
+      });
+      const result = {
+        message: 'Recipe Updated.',
+        request: {
+          description: 'Request to retrieve updated record',
+          type: 'GET',
+          url: requrl,
+        },
+      };
+      res.status(200).json(result);
     })
     .catch(() => {
       res.status(500).json({ error: 'Failed to update.' });
