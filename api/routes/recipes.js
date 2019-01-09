@@ -6,7 +6,18 @@ const RecipeModel = require('../models/recipes');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-  res.status(200).json({ message: 'Routing Sucess.' });
+  RecipeModel.find()
+    .exec()
+    .then((recipes) => {
+      if (recipes.length > 0) {
+        res.status(200).json(recipes);
+      } else {
+        res.status(200).json({ message: 'No recipes available.' });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured while fetching data' });
+    });
 });
 
 router.post('/', (req, res) => {
@@ -23,9 +34,10 @@ router.post('/', (req, res) => {
     });
   })
     .catch((error) => {
+      // Retrieve error field
+      const field = Object.keys(error.errors)[0];
       res.status(422).json({
-        message: error.message,
-        recipe,
+        message: error.errors[field].message,
       });
     });
 });
@@ -49,18 +61,28 @@ router.get('/:recipeId', (req, res) => {
 });
 
 router.patch('/:recipeId', (req, res) => {
-  const recipe = {
-    title: req.body.title,
-    ingridients: req.body.ingridients,
-  };
-  res.status(200).json({
-    message: `Now patching ${req.params.recipeId}`,
-    recipe,
-  });
+  RecipeModel.updateOne(
+    { _id: req.params.recipeId },
+    { $set: req.body },
+  )
+    .exec()
+    .then(() => {
+      res.status(200).json({ message: 'Recipe Updated.' });
+    })
+    .catch(() => {
+      res.status(500).json({ error: 'Failed to update.' });
+    });
 });
 
 router.delete('/:recipeId', (req, res) => {
-  res.status(200).json({ message: `Now deleting ${req.params.recipeId}` });
+  RecipeModel.remove({ _id: req.params.recipeId })
+    .exec()
+    .then(() => {
+      res.status(200).json({ message: 'The recipe was deleted' });
+    })
+    .catch((error) => {
+      res.status(500).json({ error });
+    });
 });
 
 module.exports = router;

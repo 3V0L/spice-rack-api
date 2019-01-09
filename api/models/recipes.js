@@ -14,7 +14,7 @@ const recipeSchema = mongoose.Schema({
     type: Number,
     min: [2, 'Minimum time of 2 mins'],
     max: [260, 'Maximum time of 260 mins'],
-    required: [true, 'Ingridients are required'],
+    required: [true, 'Time is required'],
   },
 });
 
