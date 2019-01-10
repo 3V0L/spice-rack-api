@@ -5,6 +5,7 @@ const debug = require('debug')('app');
 require('dotenv').config();
 
 mongoose.connect(process.env.DEV_DB, { useNewUrlParser: true });
+mongoose.Promise = global.Promise;
 
 const app = require('./app');
 

@@ -4,8 +4,10 @@
 An API for managing recipes that one enters as well as finding recipes created by other people.
 
 ## Technologies Used
-- NodeJS
-- Express
+  - NodeJS
+  - Express
+  - MongoDB
+  - ESLint (AirBnB Style)
 
 ### Made By
 Tapiwa Lason Mapundematsva
