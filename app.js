@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
 const recipeRoutes = require('./api/routes/recipes');
+const returnURLMapping = require('./api/helpers/mapReturnObjects');
 
 const app = express();
 
@@ -20,6 +21,12 @@ app.use((req, res, next) => {
   }
   // Call next at end of middleware so we unblock the incoming request due to the OPTIONS request
   next();
+});
+
+app.get('/', (req, res) => {
+  res.status(200).json({
+    requests: returnURLMapping.startMethods(req),
+  });
 });
 
 app.use('/recipes', recipeRoutes);

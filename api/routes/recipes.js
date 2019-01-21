@@ -1,20 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const url = require('url');
 
 const RecipeModel = require('../models/recipes');
+const returnURLMapping = require('../helpers/mapReturnObjects');
 
 const router = express.Router();
 
 router.get('/', (req, res) => {
   RecipeModel.find()
-    .select('_id title ingredients time')
+    .select('_id title ingredients time instructions servings')
     .exec()
     .then((recipes) => {
       if (recipes.length > 0) {
         const response = {
           totalCount: recipes.length,
-          recipes,
+          allRecipes: returnURLMapping.allRecipes(req, recipes),
         };
         res.status(200).json(response);
       } else {
@@ -32,6 +32,8 @@ router.post('/', (req, res) => {
     title: req.body.title,
     ingredients: req.body.ingredients,
     time: req.body.time,
+    instructions: req.body.instructions,
+    servings: req.body.servings,
   });
   recipe.save().then((result) => {
     res.status(201).json({
@@ -41,6 +43,9 @@ router.post('/', (req, res) => {
         title: result.title,
         ingredients: result.ingredients,
         time: result.time,
+        instructions: result.instructions,
+        servings: result.servings,
+        requests: returnURLMapping.addRecipe(req, result.id),
       },
     });
   })
@@ -55,11 +60,11 @@ router.post('/', (req, res) => {
 
 router.get('/:recipeId', (req, res) => {
   RecipeModel.findById(req.params.recipeId)
-    .select('_id title ingredients time')
+    .select('_id title ingredients time instructions servings')
     .exec()
-    .then((record) => {
-      if (record) {
-        res.status(200).json({ recipe: record });
+    .then((recipe) => {
+      if (recipe) {
+        res.status(200).json({ recipe: returnURLMapping.singleRecipes(req, recipe) });
       } else {
         res.status(404).json({ error: 'Recipe not found.' });
       }
@@ -79,19 +84,9 @@ router.patch('/:recipeId', (req, res) => {
   )
     .exec()
     .then(() => {
-      // Generate URL for getting the Patched record
-      const requrl = url.format({
-        protocol: req.protocol,
-        host: req.get('host'),
-        pathname: req.originalUrl,
-      });
       const result = {
         message: 'Recipe Updated.',
-        request: {
-          description: 'Request to retrieve updated record',
-          type: 'GET',
-          url: requrl,
-        },
+        requests: returnURLMapping.addRecipe(req, req.params.recipeId),
       };
       res.status(200).json(result);
     })
@@ -104,10 +99,16 @@ router.delete('/:recipeId', (req, res) => {
   RecipeModel.remove({ _id: req.params.recipeId })
     .exec()
     .then(() => {
-      res.status(200).json({ message: 'The recipe was deleted' });
+      res.status(200).json({
+        message: 'The recipe was deleted',
+        requests: returnURLMapping.startMethods(req),
+      });
     })
     .catch((error) => {
-      res.status(500).json({ error });
+      res.status(500).json({
+        message: 'An error occured while deleting this object. Please try again.',
+        error,
+      });
     });
 });
 
