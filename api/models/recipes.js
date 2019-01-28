@@ -27,6 +27,10 @@ const recipeSchema = mongoose.Schema({
     max: [260, 'Maximum of 25 servings is allowed'],
     required: [true, 'Please enter the number of servings required'],
   },
+  recipeImage: {
+    type: String,
+    required: [true, 'An image of the recipe is required'],
+  },
 });
 
 module.exports = mongoose.model('RecipeModel', recipeSchema);
