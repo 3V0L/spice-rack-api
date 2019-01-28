@@ -1,14 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 const RecipeModel = require('../models/recipes');
 const returnURLMapping = require('../helpers/mapReturnObjects');
+const imageUpload = require('../helpers/imageUpload');
 
 const router = express.Router();
 
 router.get('/', (req, res) => {
   RecipeModel.find()
-    .select('_id title ingredients time instructions servings')
+    .select('_id title ingredients time instructions servings recipeImage')
     .exec()
     .then((recipes) => {
       if (recipes.length > 0) {
@@ -26,14 +28,19 @@ router.get('/', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', imageUpload.single('recipeImage'), (req, res) => {
+  let instructionsObj = req.body.instructions;
+  if (typeof req.body.instructions === 'string') {
+    instructionsObj = JSON.parse(req.body.instructions);
+  }
   const recipe = new RecipeModel({
     _id: new mongoose.Types.ObjectId(),
     title: req.body.title,
     ingredients: req.body.ingredients,
     time: req.body.time,
-    instructions: req.body.instructions,
+    instructions: instructionsObj,
     servings: req.body.servings,
+    recipeImage: req.file.path,
   });
   recipe.save().then((result) => {
     res.status(201).json({
@@ -45,11 +52,14 @@ router.post('/', (req, res) => {
         time: result.time,
         instructions: result.instructions,
         servings: result.servings,
+        recipeImage: result.recipeImage,
         requests: returnURLMapping.addRecipe(req, result.id),
       },
     });
   })
     .catch((error) => {
+      // Delete file if an error occurs
+      fs.unlinkSync(req.file.path);
       // Retrieve error field
       const field = Object.keys(error.errors)[0];
       res.status(422).json({
@@ -60,7 +70,7 @@ router.post('/', (req, res) => {
 
 router.get('/:recipeId', (req, res) => {
   RecipeModel.findById(req.params.recipeId)
-    .select('_id title ingredients time instructions servings')
+    .select('_id title ingredients time instructions servings recipeImage')
     .exec()
     .then((recipe) => {
       if (recipe) {
