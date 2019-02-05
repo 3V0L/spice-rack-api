@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
+const authRoutes = require('./api/routes/users');
 const recipeRoutes = require('./api/routes/recipes');
 const returnURLMapping = require('./api/helpers/mapReturnObjects');
 
@@ -31,5 +32,6 @@ app.get('/', (req, res) => {
 });
 
 app.use('/recipes', recipeRoutes);
+app.use('/auth', authRoutes);
 
 module.exports = app;
