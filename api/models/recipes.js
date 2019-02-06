@@ -2,13 +2,22 @@ const mongoose = require('mongoose');
 
 const recipeSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'UserModel',
+  },
   title: {
     type: String,
-    required: [true, 'Title is required'],
+    minlength: 4,
+    maxlength: 30,
+    required: [true, 'Title is a required string field'],
   },
   ingredients: {
     type: String,
-    required: [true, 'Ingredients are required'],
+    minlength: 4,
+    maxlength: 60,
+    required: [true, 'Ingredients are a required comma separated field'],
   },
   time: {
     type: Number,

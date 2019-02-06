@@ -6,7 +6,8 @@ const returnURLMapping = require('../helpers/mapReturnObjects');
 
 exports.getAllRecipes = (req, res) => {
   RecipeModel.find()
-    .select('_id title ingredients time instructions servings recipeImage')
+    .select('_id title author ingredients time instructions servings recipeImage')
+    .populate('author', 'name')
     .exec()
     .then((recipes) => {
       if (recipes.length > 0) {
@@ -26,7 +27,8 @@ exports.getAllRecipes = (req, res) => {
 
 exports.getSingleRecipe = (req, res) => {
   RecipeModel.findById(req.params.recipeId)
-    .select('_id title ingredients time instructions servings recipeImage')
+    .select('_id title author ingredients time instructions servings recipeImage')
+    .populate('author', 'name')
     .exec()
     .then((recipe) => {
       if (recipe) {
@@ -68,6 +70,7 @@ exports.addRecipe = (req, res) => {
   }
   const recipe = new RecipeModel({
     _id: new mongoose.Types.ObjectId(),
+    author: req.userData.userId,
     title: req.body.title,
     ingredients: req.body.ingredients,
     time: req.body.time,
@@ -80,6 +83,7 @@ exports.addRecipe = (req, res) => {
       message: 'Recipe Created',
       createdRecipe: {
         _id: result.id,
+        author: result.author,
         title: result.title,
         ingredients: result.ingredients,
         time: result.time,
