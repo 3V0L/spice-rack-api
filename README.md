@@ -18,6 +18,7 @@ An API for managing recipes that one enters as well as finding recipes created b
   - Store recipe to my book
   - make recipes private or public
   - Rate a recipe
+  - retrieve a specific user's profile
 
 ### Made By
 Tapiwa Lason Mapundematsva

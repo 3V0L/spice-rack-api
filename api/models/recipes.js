@@ -40,6 +40,11 @@ const recipeSchema = mongoose.Schema({
     type: String,
     required: [true, 'An image of the recipe is required'],
   },
+  public: {
+    type: Boolean,
+    required: [true, 'Please state whether this recipe is public'],
+
+  },
 });
 
 module.exports = mongoose.model('RecipeModel', recipeSchema);

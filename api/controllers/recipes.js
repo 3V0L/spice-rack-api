@@ -6,7 +6,8 @@ const returnURLMapping = require('../helpers/mapReturnObjects');
 
 exports.getAllRecipes = (req, res) => {
   RecipeModel.find()
-    .select('_id title author ingredients time instructions servings recipeImage')
+    .select('_id title author ingredients time instructions servings recipeImage public')
+    .where('public').gte(true)
     .populate('author', 'name')
     .exec()
     .then((recipes) => {
@@ -77,6 +78,7 @@ exports.addRecipe = (req, res) => {
     instructions: instructionsObj,
     servings: req.body.servings,
     recipeImage: req.file.path,
+    public: req.body.public,
   });
   recipe.save().then((result) => {
     res.status(201).json({
@@ -89,6 +91,7 @@ exports.addRecipe = (req, res) => {
         time: result.time,
         instructions: result.instructions,
         servings: result.servings,
+        public: result.public,
         recipeImage: result.recipeImage,
         requests: returnURLMapping.addRecipe(req, result.id),
       },
@@ -106,7 +109,16 @@ exports.addRecipe = (req, res) => {
 };
 
 exports.deleteRecipe = (req, res) => {
-  RecipeModel.remove({ _id: req.params.recipeId })
+  RecipeModel.findOne({ _id: req.params.recipeId, author: req.userData.userId })
+    .exec()
+    .then((result) => {
+      if (!result) {
+        res.status(403).json({ message: 'You are not authorized to perform this action' });
+      }
+    })
+    .catch();
+
+  RecipeModel.deleteOne({ _id: req.params.recipeId, author: req.userData.userId })
     .exec()
     .then(() => {
       res.status(200).json({
