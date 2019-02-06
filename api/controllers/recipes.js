@@ -29,6 +29,7 @@ exports.getAllRecipes = (req, res) => {
 exports.getSingleRecipe = (req, res) => {
   RecipeModel.findById(req.params.recipeId)
     .select('_id title author ingredients time instructions servings recipeImage')
+    .where('public').gte(true)
     .populate('author', 'name')
     .exec()
     .then((recipe) => {
@@ -129,6 +130,27 @@ exports.deleteRecipe = (req, res) => {
     .catch((error) => {
       res.status(500).json({
         message: 'An error occured while deleting this object. Please try again.',
+        error,
+      });
+    });
+};
+
+exports.getMySingleRecipe = (req, res) => {
+  RecipeModel.findById(req.params.recipeId)
+    .select('_id title author ingredients time instructions servings recipeImage')
+    .where('author').gte(req.userData.userId)
+    .populate('author', 'name')
+    .exec()
+    .then((recipe) => {
+      if (recipe) {
+        res.status(200).json({ recipe: returnURLMapping.singleRecipes(req, recipe) });
+      } else {
+        res.status(404).json({ error: 'Recipe not found.' });
+      }
+    })
+    .catch((error) => {
+      res.status(500).json({
+        message: 'An error occured while fetching the data.',
         error,
       });
     });

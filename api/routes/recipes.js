@@ -12,6 +12,8 @@ router.post('/', checkAuth, imageUpload.single('recipeImage'), RecipesController
 
 router.get('/:recipeId', RecipesController.getSingleRecipe);
 
+router.get('/my-recipes/:recipeId', checkAuth, RecipesController.getMySingleRecipe);
+
 router.patch('/:recipeId', checkAuth, RecipesController.patchRecipe);
 
 router.delete('/:recipeId', checkAuth, RecipesController.deleteRecipe);
