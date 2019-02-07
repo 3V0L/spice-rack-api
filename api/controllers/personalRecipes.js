@@ -1,5 +1,6 @@
 const RecipeModel = require('../models/recipes');
 const returnURLMapping = require('../helpers/mapReturnObjects');
+const recipeHelper = require('../helpers/recipeHelper');
 
 exports.getMySingleRecipe = (req, res) => {
   RecipeModel.findById(req.params.recipeId)
@@ -41,5 +42,49 @@ exports.getAllMyRecipes = (req, res) => {
     })
     .catch(() => {
       res.status(500).json({ message: 'An error occured while fetching data' });
+    });
+};
+
+exports.patchRecipe = (req, res) => {
+  RecipeModel.updateOne(
+    { _id: req.params.recipeId },
+    { $set: recipeHelper.updateRecipe(req.body, req.file) },
+  )
+    .exec()
+    .then(() => {
+      const result = {
+        message: 'Recipe Updated.',
+        requests: returnURLMapping.addRecipe(req, req.params.recipeId),
+      };
+      res.status(200).json(result);
+    })
+    .catch(() => {
+      res.status(500).json({ error: 'Failed to update.' });
+    });
+};
+
+exports.deleteRecipe = (req, res) => {
+  RecipeModel.findOne({ _id: req.params.recipeId, author: req.userData.userId })
+    .exec()
+    .then((result) => {
+      if (!result) {
+        res.status(403).json({ message: 'You are not authorized to perform this action' });
+      }
+    })
+    .catch();
+
+  RecipeModel.deleteOne({ _id: req.params.recipeId, author: req.userData.userId })
+    .exec()
+    .then(() => {
+      res.status(200).json({
+        message: 'The recipe was deleted',
+        requests: returnURLMapping.startMethods(req),
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        message: 'An error occured while deleting this object. Please try again.',
+        error,
+      });
     });
 };

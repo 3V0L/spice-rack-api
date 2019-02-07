@@ -13,10 +13,8 @@ An API for managing recipes that one enters as well as finding recipes created b
 ## Tasks Yet to Be Done:
   - Tests
   - Users can add/edit image
-  - Edit image for recipe
   - Search for recipe
   - Store recipe to my book
-  - make recipes private or public
   - Rate a recipe
   - retrieve a specific user's profile
 
