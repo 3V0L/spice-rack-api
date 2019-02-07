@@ -4,6 +4,7 @@ const fs = require('fs');
 const RecipeModel = require('../models/recipes');
 const returnURLMapping = require('../helpers/mapReturnObjects');
 const recipeHelper = require('../helpers/recipeHelper');
+const personalRecipeController = require('./personalRecipes');
 
 exports.getAllRecipes = (req, res) => {
   RecipeModel.find()
@@ -87,4 +88,32 @@ exports.addRecipe = (req, res) => {
         message: error.errors[field].message,
       });
     });
+};
+
+exports.getSingleUserRecipes = (req, res) => {
+  if (req.userData.userId === req.params.userId) {
+    personalRecipeController.getAllMyRecipes(req, res);
+  } else {
+    RecipeModel.find()
+      .select('_id title author ingredients time instructions servings recipeImage public')
+      .where('author').gte(req.params.userId)
+      .where('public')
+      .gte(true)
+      .populate('author', 'name')
+      .exec()
+      .then((recipes) => {
+        if (recipes.length > 0) {
+          const response = {
+            totalCount: recipes.length,
+            allRecipes: returnURLMapping.allRecipes(req, recipes),
+          };
+          res.status(200).json(response);
+        } else {
+          res.status(200).json({ message: 'No recipes available.' });
+        }
+      })
+      .catch(() => {
+        res.status(500).json({ message: 'An error occured while fetching data' });
+      });
+  }
 };
