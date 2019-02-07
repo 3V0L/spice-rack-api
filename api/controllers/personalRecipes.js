@@ -3,7 +3,7 @@ const returnURLMapping = require('../helpers/mapReturnObjects');
 
 exports.getMySingleRecipe = (req, res) => {
   RecipeModel.findById(req.params.recipeId)
-    .select('_id title author ingredients time instructions servings recipeImage')
+    .select('_id title author ingredients time instructions servings recipeImage public')
     .where('author').gte(req.userData.userId)
     .populate('author', 'name')
     .exec()

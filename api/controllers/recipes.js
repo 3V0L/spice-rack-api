@@ -51,7 +51,7 @@ exports.getSingleRecipe = (req, res) => {
 exports.patchRecipe = (req, res) => {
   RecipeModel.updateOne(
     { _id: req.params.recipeId },
-    { $set: req.body },
+    { $set: recipeHelper.updateRecipe(req.body, req.file) },
   )
     .exec()
     .then(() => {
@@ -67,7 +67,7 @@ exports.patchRecipe = (req, res) => {
 };
 
 exports.addRecipe = (req, res) => {
-  const instructionsObj = recipeHelper.convertObject(req.body.instructions);
+  const instructionsObj = recipeHelper.convertToObject(req.body.instructions);
   const recipe = new RecipeModel({
     _id: new mongoose.Types.ObjectId(),
     author: req.userData.userId,
@@ -128,28 +128,6 @@ exports.deleteRecipe = (req, res) => {
     .catch((error) => {
       res.status(500).json({
         message: 'An error occured while deleting this object. Please try again.',
-        error,
-      });
-    });
-};
-
-
-exports.getMySingleRecipe = (req, res) => {
-  RecipeModel.findById(req.params.recipeId)
-    .select('_id title author ingredients time instructions servings recipeImage')
-    .where('author').gte(req.userData.userId)
-    .populate('author', 'name')
-    .exec()
-    .then((recipe) => {
-      if (recipe) {
-        res.status(200).json({ recipe: returnURLMapping.singleRecipes(req, recipe) });
-      } else {
-        res.status(404).json({ error: 'Recipe not found.' });
-      }
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: 'An error occured while fetching the data.',
         error,
       });
     });
