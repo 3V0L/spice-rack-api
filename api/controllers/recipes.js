@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const RecipeModel = require('../models/recipes');
 const returnURLMapping = require('../helpers/mapReturnObjects');
+const recipeHelper = require('../helpers/recipeHelper');
 
 exports.getAllRecipes = (req, res) => {
   RecipeModel.find()
@@ -66,10 +67,7 @@ exports.patchRecipe = (req, res) => {
 };
 
 exports.addRecipe = (req, res) => {
-  let instructionsObj = req.body.instructions;
-  if (typeof req.body.instructions === 'string') {
-    instructionsObj = JSON.parse(req.body.instructions);
-  }
+  const instructionsObj = recipeHelper.convertObject(req.body.instructions);
   const recipe = new RecipeModel({
     _id: new mongoose.Types.ObjectId(),
     author: req.userData.userId,
@@ -134,6 +132,7 @@ exports.deleteRecipe = (req, res) => {
       });
     });
 };
+
 
 exports.getMySingleRecipe = (req, res) => {
   RecipeModel.findById(req.params.recipeId)

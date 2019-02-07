@@ -60,6 +60,7 @@ exports.Login = (req, res) => {
             { expiresIn: '1hr' });
           return res.status(200).json({
             message: 'User Logged In.',
+            username: user.name,
             token,
           });
         }
