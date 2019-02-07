@@ -10,9 +10,9 @@ router.get('/', RecipesController.getAllRecipes);
 
 router.post('/', checkAuth, imageUpload.single('recipeImage'), RecipesController.addRecipe);
 
-router.get('/:recipeId', RecipesController.getAllRecipes);
+router.get('/:recipeId', RecipesController.getSingleRecipe);
 
-router.patch('/:recipeId', checkAuth, RecipesController.patchRecipe);
+router.patch('/:recipeId', checkAuth, imageUpload.single('recipeImage'), RecipesController.patchRecipe);
 
 router.delete('/:recipeId', checkAuth, RecipesController.deleteRecipe);
 
