@@ -1,3 +1,6 @@
+const RecipeModel = require('../models/recipes');
+const returnURLMapping = require('../helpers/mapReturnObjects');
+
 const recipeHelper = {};
 
 recipeHelper.convertToObject = (req) => {
@@ -20,6 +23,37 @@ recipeHelper.updateRecipe = (body, file) => {
     }
   });
   return updateObject;
+};
+
+recipeHelper.checkRecipeIsPublic = (req, res) => {
+  RecipeModel.findById(req.params.recipeId)
+    .select('_id public recipeImage')
+    .exec()
+    .then((recipe) => {
+      if (recipe.public === false || recipe === null) {
+        return false;
+      }
+    })
+    .catch((error) => {
+      res.status(500).json({
+        message: 'An error occured while performing this action.',
+        error,
+      });
+    });
+};
+
+recipeHelper.retrieveFavouriteRecipes = (req, res, recipeIds) => {
+  RecipeModel.find({ _id: { $in: recipeIds } }, (err, recipes) => {
+    if (err) {
+      res.status(500).json({ message: 'An error occured. Please try again.' });
+    } else {
+      res.status(200).json({
+        count: recipes.length,
+        recipes,
+        requests: returnURLMapping.removeGetFavourites(req),
+      });
+    }
+  });
 };
 
 module.exports = recipeHelper;

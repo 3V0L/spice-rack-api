@@ -50,6 +50,9 @@ exports.getSingleRecipe = (req, res) => {
 };
 
 exports.addRecipe = (req, res) => {
+  if (!req.userData) {
+    res.status(403).json({ message: 'You are not allowed to perform this action' });
+  }
   const instructionsObj = recipeHelper.convertToObject(req.body.instructions);
   const recipe = new RecipeModel({
     _id: new mongoose.Types.ObjectId(),

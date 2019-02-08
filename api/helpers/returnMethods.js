@@ -51,4 +51,22 @@ returnMethods.addRecipe = req => ({
   sampleData,
 });
 
+returnMethods.getAllFavourites = req => ({
+  method: 'Get',
+  description: 'Get all favourites',
+  path: path(req, 'favouries'),
+});
+
+returnMethods.removeFavourite = (req, recipeId) => ({
+  method: 'Delete',
+  description: 'Remove this recipe from favourites',
+  path: path(req, `favourites/${recipeId}`),
+});
+
+returnMethods.addFavourite = req => ({
+  method: 'Post',
+  description: 'Add a recipe to favourites',
+  path: path(req, 'favourites/{RECIPE_ID}'),
+});
+
 module.exports = returnMethods;

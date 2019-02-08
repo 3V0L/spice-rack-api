@@ -24,6 +24,7 @@ const userSchema = mongoose.Schema({
   userImage: {
     type: String,
   },
+  favourites: { type: [mongoose.Schema.Types.ObjectId], ref: 'RecipeModel' },
 });
 
 module.exports = mongoose.model('UserModel', userSchema);

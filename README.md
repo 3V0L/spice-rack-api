@@ -14,9 +14,7 @@ An API for managing recipes that one enters as well as finding recipes created b
   - Tests
   - Users can add/edit image
   - Search for recipe
-  - Store recipe to my book
   - Rate a recipe
-  - retrieve a specific user's profile
 
 ### Made By
 Tapiwa Lason Mapundematsva
