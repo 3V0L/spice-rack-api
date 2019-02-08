@@ -4,6 +4,7 @@ const fs = require('fs');
 const RecipeModel = require('../models/recipes');
 const returnURLMapping = require('../helpers/mapReturnObjects');
 const recipeHelper = require('../helpers/recipeHelper');
+const personalRecipeController = require('./personalRecipes');
 
 exports.getAllRecipes = (req, res) => {
   RecipeModel.find()
@@ -48,25 +49,10 @@ exports.getSingleRecipe = (req, res) => {
     });
 };
 
-exports.patchRecipe = (req, res) => {
-  RecipeModel.updateOne(
-    { _id: req.params.recipeId },
-    { $set: recipeHelper.updateRecipe(req.body, req.file) },
-  )
-    .exec()
-    .then(() => {
-      const result = {
-        message: 'Recipe Updated.',
-        requests: returnURLMapping.addRecipe(req, req.params.recipeId),
-      };
-      res.status(200).json(result);
-    })
-    .catch(() => {
-      res.status(500).json({ error: 'Failed to update.' });
-    });
-};
-
 exports.addRecipe = (req, res) => {
+  if (!req.userData) {
+    res.status(403).json({ message: 'You are not allowed to perform this action' });
+  }
   const instructionsObj = recipeHelper.convertToObject(req.body.instructions);
   const recipe = new RecipeModel({
     _id: new mongoose.Types.ObjectId(),
@@ -107,28 +93,30 @@ exports.addRecipe = (req, res) => {
     });
 };
 
-exports.deleteRecipe = (req, res) => {
-  RecipeModel.findOne({ _id: req.params.recipeId, author: req.userData.userId })
-    .exec()
-    .then((result) => {
-      if (!result) {
-        res.status(403).json({ message: 'You are not authorized to perform this action' });
-      }
-    })
-    .catch();
-
-  RecipeModel.deleteOne({ _id: req.params.recipeId, author: req.userData.userId })
-    .exec()
-    .then(() => {
-      res.status(200).json({
-        message: 'The recipe was deleted',
-        requests: returnURLMapping.startMethods(req),
+exports.getSingleUserRecipes = (req, res) => {
+  if (req.userData.userId === req.params.userId) {
+    personalRecipeController.getAllMyRecipes(req, res);
+  } else {
+    RecipeModel.find()
+      .select('_id title author ingredients time instructions servings recipeImage public')
+      .where('author').gte(req.params.userId)
+      .where('public')
+      .gte(true)
+      .populate('author', 'name')
+      .exec()
+      .then((recipes) => {
+        if (recipes.length > 0) {
+          const response = {
+            totalCount: recipes.length,
+            allRecipes: returnURLMapping.allRecipes(req, recipes),
+          };
+          res.status(200).json(response);
+        } else {
+          res.status(200).json({ message: 'No recipes available.' });
+        }
+      })
+      .catch(() => {
+        res.status(500).json({ message: 'An error occured while fetching data' });
       });
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: 'An error occured while deleting this object. Please try again.',
-        error,
-      });
-    });
+  }
 };

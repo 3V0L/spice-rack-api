@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const recipeSchema = mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'RecipeModel',
+  },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

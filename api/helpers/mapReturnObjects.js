@@ -45,4 +45,26 @@ requestURLMapping.startMethods = (req) => {
   return requests;
 };
 
+requestURLMapping.Favourites = (req, recipeId) => {
+  const requests = {
+    getAllRecipes: returnMethods.getAllMethod(req),
+    getSingleRecipe: returnMethods.getSingleRecipe(req, recipeId),
+    addNewFavourite: returnMethods.addFavourite(req),
+    removeFromFavourites: returnMethods.removeFavourite(req, recipeId),
+    getAllFavourites: returnMethods.getAllFavourites(req),
+  };
+  return requests;
+};
+
+requestURLMapping.removeGetFavourites = (req) => {
+  const requests = {
+    getAllRecipes: returnMethods.getAllMethod(req),
+    getSingleRecipe: returnMethods.getSingleRecipe(req, '{RECIPE_ID'),
+    addNewFavourite: returnMethods.addFavourite(req),
+    removeFromFavourites: returnMethods.removeFavourite(req, '{RECIPE_ID'),
+    getAllFavourites: returnMethods.getAllFavourites(req),
+  };
+  return requests;
+};
+
 module.exports = requestURLMapping;
