@@ -2,13 +2,12 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 
 const RecipeModel = require('../models/recipes');
-const returnURLMapping = require('../helpers/mapReturnObjects');
 const recipeHelper = require('../helpers/recipeHelper');
 const personalRecipeController = require('./personalRecipes');
 
 exports.getAllRecipes = (req, res) => {
   RecipeModel.find()
-    .select('_id title author ingredients time instructions servings recipeImage public')
+    .select('_id title author ingredients time instructions servings recipeImage public reviews')
     .where('public').gte(true)
     .populate('author', 'name')
     .exec()
@@ -16,7 +15,7 @@ exports.getAllRecipes = (req, res) => {
       if (recipes.length > 0) {
         const response = {
           totalCount: recipes.length,
-          allRecipes: returnURLMapping.allRecipes(req, recipes),
+          recipes,
         };
         res.status(200).json(response);
       } else {
@@ -30,13 +29,13 @@ exports.getAllRecipes = (req, res) => {
 
 exports.getSingleRecipe = (req, res) => {
   RecipeModel.findById(req.params.recipeId)
-    .select('_id title author ingredients time instructions servings recipeImage')
+    .select('_id title author ingredients time instructions servings recipeImage reviews')
     .where('public').gte(true)
     .populate('author', 'name')
     .exec()
     .then((recipe) => {
       if (recipe) {
-        res.status(200).json({ recipe: returnURLMapping.singleRecipes(req, recipe) });
+        res.status(200).json({ recipe });
       } else {
         res.status(404).json({ error: 'Recipe not found.' });
       }
@@ -78,7 +77,6 @@ exports.addRecipe = (req, res) => {
         servings: result.servings,
         public: result.public,
         recipeImage: result.recipeImage,
-        requests: returnURLMapping.addRecipe(req, result.id),
       },
     });
   })
@@ -98,7 +96,7 @@ exports.getSingleUserRecipes = (req, res) => {
     personalRecipeController.getAllMyRecipes(req, res);
   } else {
     RecipeModel.find()
-      .select('_id title author ingredients time instructions servings recipeImage public')
+      .select('_id title author ingredients time instructions servings recipeImage public reviews')
       .where('author').gte(req.params.userId)
       .where('public')
       .gte(true)
@@ -108,7 +106,7 @@ exports.getSingleUserRecipes = (req, res) => {
         if (recipes.length > 0) {
           const response = {
             totalCount: recipes.length,
-            allRecipes: returnURLMapping.allRecipes(req, recipes),
+            recipes,
           };
           res.status(200).json(response);
         } else {
@@ -118,5 +116,60 @@ exports.getSingleUserRecipes = (req, res) => {
       .catch(() => {
         res.status(500).json({ message: 'An error occured while fetching data' });
       });
+  }
+};
+
+exports.rateRecipe = (req, res) => {
+  const ratingInt = parseInt(req.body.rating, 10);
+  if (!recipeHelper.validateRating(ratingInt)) {
+    res.status(422).json({ message: 'A rating must be between 1 and 5' });
+  } else {
+    const review = {
+      userId: req.userData.userId,
+      rating: ratingInt,
+      comment: req.body.comment,
+    };
+    RecipeModel.findOneAndUpdate(
+      {
+        'reviews.userId': req.userData.userId,
+        _id: req.params.recipeId,
+      },
+      {
+        $set: {
+          'reviews.$.rating': ratingInt,
+          'reviews.$.comment': req.body.comment,
+        },
+      },
+      async (error, result) => {
+        if (!error) {
+          // If the document doesn't exist
+          if (!result) {
+            // Create it\
+            await RecipeModel.update(
+              { _id: req.params.recipeId },
+              { $push: { reviews: review } },
+              (errors, results) => {
+                if (results) {
+                  res.status(200).json({ message: 'Review Added', results });
+                } else {
+                  res.status(500).json({ message: 'An error occured, try again.', errors });
+                }
+              },
+            );
+          }
+          // Save the document
+          result.save((err) => {
+            if (!err) {
+              // Do something with the document
+              res.status(200).json({ message: 'Review Updated' });
+            } else {
+              res.status(500).json({ message: 'An error occured. Try again.' });
+            }
+          });
+        } else {
+          res.status(500).json({ message: 'An error occured. Try again.' });
+        }
+      },
+    );
   }
 };

@@ -1,5 +1,4 @@
 const RecipeModel = require('../models/recipes');
-const returnURLMapping = require('../helpers/mapReturnObjects');
 
 const recipeHelper = {};
 
@@ -50,10 +49,23 @@ recipeHelper.retrieveFavouriteRecipes = (req, res, recipeIds) => {
       res.status(200).json({
         count: recipes.length,
         recipes,
-        requests: returnURLMapping.removeGetFavourites(req),
       });
     }
   });
+};
+
+recipeHelper.validateRating = (rating) => {
+  try {
+    const ratingInt = parseInt(rating, 10);
+    const minValue = ratingInt > 0;
+    const maxValue = ratingInt < 6;
+    if (minValue && maxValue) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
 };
 
 module.exports = recipeHelper;

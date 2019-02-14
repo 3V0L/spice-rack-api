@@ -1,5 +1,4 @@
 const UserModel = require('../models/users');
-const returnURLMapping = require('../helpers/mapReturnObjects');
 const recipeHelper = require('../helpers/recipeHelper');
 
 
@@ -16,12 +15,10 @@ exports.addFavourites = (req, res) => {
       if (response.nModified === 0) {
         res.status(409).json({
           message: 'Recipe already in favourites',
-          requests: returnURLMapping.Favourites(req, req.params.recipeId),
         });
       }
       const result = {
         message: 'Reipe added to Favourites.',
-        requests: returnURLMapping.Favourites(req, req.params.recipeId),
       };
       res.status(201).json(result);
     })
@@ -38,7 +35,6 @@ exports.getAllFavourites = (req, res) => {
       if (user.favourites.length < 1) {
         res.status(200).json({
           message: 'No recipes on favourite list yet',
-          requests: returnURLMapping.removeGetFavourites(req),
         });
       } else {
         recipeHelper.retrieveFavouriteRecipes(req, res, user.favourites);
@@ -58,7 +54,6 @@ exports.removeFavourite = (req, res) => {
     .then(() => {
       res.status(200).json({
         message: 'Recipe has been removed from favourites',
-        requests: returnURLMapping.removeGetFavourites(req),
       });
     })
     .catch(() => {

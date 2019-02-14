@@ -1,7 +1,7 @@
 const express = require('express');
 
 const imageUpload = require('../helpers/imageUpload');
-const checkAuth = require('../middleware/checkAuth');
+const checkAuth = require('../helpers/middlewares');
 const RecipesController = require('../controllers/recipes');
 
 const router = express.Router();
@@ -13,5 +13,7 @@ router.post('/', checkAuth, imageUpload.single('recipeImage'), RecipesController
 router.get('/:recipeId', RecipesController.getSingleRecipe);
 
 router.get('/user/:userId', checkAuth, RecipesController.getSingleUserRecipes);
+
+router.post('/review/:recipeId', checkAuth, RecipesController.rateRecipe);
 
 module.exports = router;
