@@ -1,5 +1,4 @@
 const RecipeModel = require('../models/recipes');
-const returnURLMapping = require('../helpers/mapReturnObjects');
 
 const recipeHelper = {};
 
@@ -50,7 +49,6 @@ recipeHelper.retrieveFavouriteRecipes = (req, res, recipeIds) => {
       res.status(200).json({
         count: recipes.length,
         recipes,
-        requests: returnURLMapping.removeGetFavourites(req),
       });
     }
   });

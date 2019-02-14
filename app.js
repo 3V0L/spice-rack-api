@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./api/routes/users');
 const recipeRoutes = require('./api/routes/recipes');
 const personalRecipeRoutes = require('./api/routes/personalRecipes');
-const returnURLMapping = require('./api/helpers/mapReturnObjects');
 const favouritesRecipeRoutes = require('./api/routes/favourites');
 
 const app = express();
@@ -28,9 +27,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  res.status(200).json({
-    requests: returnURLMapping.startMethods(req),
-  });
+  res.status(200).json({ message: 'Welcome to Spice Rack.' });
 });
 
 app.use('/my-recipes', personalRecipeRoutes);

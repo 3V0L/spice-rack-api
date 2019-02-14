@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 
 const RecipeModel = require('../models/recipes');
-const returnURLMapping = require('../helpers/mapReturnObjects');
 const recipeHelper = require('../helpers/recipeHelper');
 const personalRecipeController = require('./personalRecipes');
 
@@ -16,7 +15,7 @@ exports.getAllRecipes = (req, res) => {
       if (recipes.length > 0) {
         const response = {
           totalCount: recipes.length,
-          allRecipes: returnURLMapping.allRecipes(req, recipes),
+          recipes,
         };
         res.status(200).json(response);
       } else {
@@ -36,7 +35,7 @@ exports.getSingleRecipe = (req, res) => {
     .exec()
     .then((recipe) => {
       if (recipe) {
-        res.status(200).json({ recipe: returnURLMapping.singleRecipes(req, recipe) });
+        res.status(200).json({ recipe });
       } else {
         res.status(404).json({ error: 'Recipe not found.' });
       }
@@ -78,7 +77,6 @@ exports.addRecipe = (req, res) => {
         servings: result.servings,
         public: result.public,
         recipeImage: result.recipeImage,
-        requests: returnURLMapping.addRecipe(req, result.id),
       },
     });
   })
@@ -108,7 +106,7 @@ exports.getSingleUserRecipes = (req, res) => {
         if (recipes.length > 0) {
           const response = {
             totalCount: recipes.length,
-            allRecipes: returnURLMapping.allRecipes(req, recipes),
+            recipes,
           };
           res.status(200).json(response);
         } else {

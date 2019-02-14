@@ -1,5 +1,4 @@
 const RecipeModel = require('../models/recipes');
-const returnURLMapping = require('../helpers/mapReturnObjects');
 const recipeHelper = require('../helpers/recipeHelper');
 
 exports.getMySingleRecipe = (req, res) => {
@@ -10,7 +9,7 @@ exports.getMySingleRecipe = (req, res) => {
     .exec()
     .then((recipe) => {
       if (recipe) {
-        res.status(200).json({ recipe: returnURLMapping.singleRecipes(req, recipe) });
+        res.status(200).json({ recipe });
       } else {
         res.status(404).json({ error: 'Recipe not found.' });
       }
@@ -33,7 +32,7 @@ exports.getAllMyRecipes = (req, res) => {
       if (recipes.length > 0) {
         const response = {
           totalCount: recipes.length,
-          allRecipes: returnURLMapping.allRecipes(req, recipes),
+          recipes,
         };
         res.status(200).json(response);
       } else {
@@ -54,7 +53,6 @@ exports.patchRecipe = (req, res) => {
     .then(() => {
       const result = {
         message: 'Recipe Updated.',
-        requests: returnURLMapping.addRecipe(req, req.params.recipeId),
       };
       res.status(200).json(result);
     })
@@ -78,7 +76,6 @@ exports.deleteRecipe = (req, res) => {
     .then(() => {
       res.status(200).json({
         message: 'The recipe was deleted',
-        requests: returnURLMapping.startMethods(req),
       });
     })
     .catch((error) => {
