@@ -46,8 +46,8 @@ const recipeSchema = mongoose.Schema({
   public: {
     type: Boolean,
     required: [true, 'Please state whether this recipe is public'],
-
   },
+  reviews: [],
 });
 
 module.exports = mongoose.model('RecipeModel', recipeSchema);
