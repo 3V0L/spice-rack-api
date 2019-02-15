@@ -68,4 +68,17 @@ recipeHelper.validateRating = (rating) => {
   }
 };
 
+recipeHelper.createSearchArray = (params) => {
+  const response = [];
+  const newLocalField = params.field;
+  const field = newLocalField;
+  const searchValues = params.searchValue.split('+');
+  searchValues.forEach((item) => {
+    const searchObject = {};
+    searchObject[field] = new RegExp(item, 'gi');
+    response.push(searchObject);
+  });
+  return response;
+};
+
 module.exports = recipeHelper;

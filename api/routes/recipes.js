@@ -16,4 +16,6 @@ router.get('/user/:userId', checkAuth, RecipesController.getSingleUserRecipes);
 
 router.post('/review/:recipeId', checkAuth, RecipesController.rateRecipe);
 
+router.get('/search/:field/:searchValue', checkAuth, RecipesController.searchRecipes);
+
 module.exports = router;

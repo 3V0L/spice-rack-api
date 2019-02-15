@@ -9,7 +9,7 @@ exports.getAllRecipes = (req, res) => {
   RecipeModel.find()
     .select('_id title author ingredients time instructions servings recipeImage public reviews')
     .where('public').gte(true)
-    .populate('author', 'name')
+    .populate('author', 'name userImage')
     .exec()
     .then((recipes) => {
       if (recipes.length > 0) {
@@ -31,7 +31,7 @@ exports.getSingleRecipe = (req, res) => {
   RecipeModel.findById(req.params.recipeId)
     .select('_id title author ingredients time instructions servings recipeImage reviews')
     .where('public').gte(true)
-    .populate('author', 'name')
+    .populate('author', 'name userImage')
     .exec()
     .then((recipe) => {
       if (recipe) {
@@ -172,4 +172,28 @@ exports.rateRecipe = (req, res) => {
       },
     );
   }
+};
+
+exports.searchRecipes = async (req, res) => {
+  const searchValues = await recipeHelper.createSearchArray(req.params);
+
+  RecipeModel.find({ $or: searchValues })
+    .select('_id title author ingredients time instructions servings recipeImage public reviews')
+    .where('public').gte(true)
+    .populate('author', 'name userImage')
+    .exec()
+    .then((recipes) => {
+      if (recipes.length > 0) {
+        const response = {
+          totalCount: recipes.length,
+          recipes,
+        };
+        res.status(200).json(response);
+      } else {
+        res.status(200).json({ message: 'No recipes available. Try other keywords' });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured while fetching data' });
+    });
 };
