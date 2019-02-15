@@ -13,7 +13,6 @@ An API for managing recipes that one enters as well as finding recipes created b
 ## Tasks Yet to Be Done:
   - Tests
   - Users can add/edit image
-  - Search for recipe
   - Documentation
 
 ### Made By

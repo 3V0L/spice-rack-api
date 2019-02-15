@@ -5,7 +5,7 @@ exports.getMySingleRecipe = (req, res) => {
   RecipeModel.findById(req.params.recipeId)
     .select('_id title author ingredients time instructions servings recipeImage public')
     .where('author').gte(req.userData.userId)
-    .populate('author', 'name')
+    .populate('author', 'name userImage')
     .exec()
     .then((recipe) => {
       if (recipe) {
@@ -26,7 +26,7 @@ exports.getAllMyRecipes = (req, res) => {
   RecipeModel.find()
     .select('_id title author ingredients time instructions servings recipeImage public')
     .where('author').gte(req.userData.userId)
-    .populate('author', 'name')
+    .populate('author', 'name userImage')
     .exec()
     .then((recipes) => {
       if (recipes.length > 0) {
