@@ -100,3 +100,40 @@ exports.uploadImage = (req, res) => {
       res.status(500).json({ message: 'An error occured, try again.' });
     });
 };
+
+exports.getUsers = (req, res) => {
+  UserModel.find()
+    .select('_id name userImage')
+    .exec()
+    .then((results) => {
+      res.status(200).json({ count: results.length, results });
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured, try again.' });
+    });
+};
+
+exports.searchUsers = async (req, res) => {
+  const searchValues = await req.params.searchValue.split('+');
+  const response = [];
+  await searchValues.forEach((item) => {
+    response.push({ name: new RegExp(item, 'gi') });
+  });
+
+  UserModel.find({ $or: response })
+    .select('_id name userImage')
+    .exec()
+    .then((result) => {
+      if (result.length > 0) {
+        res.status(200).json({
+          totalCount: result.length,
+          result,
+        });
+      } else {
+        res.status(200).json({ message: 'No users available. Try other keywords' });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured while fetching data' });
+    });
+};

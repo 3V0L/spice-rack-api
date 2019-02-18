@@ -100,7 +100,7 @@ exports.getSingleUserRecipes = (req, res) => {
       .where('author').gte(req.params.userId)
       .where('public')
       .gte(true)
-      .populate('author', 'name')
+      .populate('author', 'name userImage')
       .exec()
       .then((recipes) => {
         if (recipes.length > 0) {

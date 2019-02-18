@@ -14,4 +14,8 @@ router.delete('/remove/:userId', UserController.deleteUser);
 
 router.post('/userImage', checkAuth, imageUpload.single('userImage'), UserController.uploadImage);
 
+router.get('/users', checkAuth, UserController.getUsers);
+
+router.get('/user/:searchValue', checkAuth, UserController.searchUsers);
+
 module.exports = router;
