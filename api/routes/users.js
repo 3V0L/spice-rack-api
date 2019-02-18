@@ -18,4 +18,8 @@ router.get('/users', checkAuth, UserController.getUsers);
 
 router.get('/user/:searchValue', checkAuth, UserController.searchUsers);
 
+router.patch('/follow/:userId', checkAuth, UserController.followUser);
+
+router.patch('/unfollow/:userId', checkAuth, UserController.unfollowUser);
+
 module.exports = router;

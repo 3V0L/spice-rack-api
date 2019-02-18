@@ -137,3 +137,31 @@ exports.searchUsers = async (req, res) => {
       res.status(500).json({ message: 'An error occured while fetching data' });
     });
 };
+
+exports.followUser = (req, res) => {
+  UserModel.update(
+    { _id: req.userData.userId },
+    { $addToSet: { following: req.params.userId } },
+    (errors, results) => {
+      if (results) {
+        res.status(200).json({ message: 'You are now following this user', results });
+      } else {
+        res.status(500).json({ message: 'An error occured, try again.', errors });
+      }
+    },
+  );
+};
+
+exports.unfollowUser = (req, res) => {
+  UserModel.update(
+    { _id: req.userData.userId },
+    { $pullAll: { following: [req.params.userId] } },
+    (errors, results) => {
+      if (results) {
+        res.status(200).json({ message: 'You unfollowed this user', results });
+      } else {
+        res.status(500).json({ message: 'An error occured, try again.', errors });
+      }
+    },
+  );
+};

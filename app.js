@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 
 app.use('/my-recipes', personalRecipeRoutes);
 app.use('/recipes', recipeRoutes);
-app.use('/auth', authRoutes);
+app.use('/profile', authRoutes);
 app.use('/favourites', favouritesRecipeRoutes);
 app.use((req, res) => {
   res.status(404).send('Route Not Valid.');
