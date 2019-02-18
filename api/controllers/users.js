@@ -88,3 +88,15 @@ exports.deleteUser = (req, res) => {
       });
     });
 };
+
+exports.uploadImage = (req, res) => {
+  UserModel.findByIdAndUpdate({ _id: req.userData.userId },
+    { $set: { userImage: req.file.path } })
+    .exec()
+    .then(() => {
+      res.status(200).json({ message: 'User Image Uploaded' });
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured, try again.' });
+    });
+};
