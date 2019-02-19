@@ -22,4 +22,6 @@ router.patch('/follow/:userId', checkAuth, UserController.followUser);
 
 router.patch('/unfollow/:userId', checkAuth, UserController.unfollowUser);
 
+router.get('/follow-count/:userId', checkAuth, UserController.followersCount);
+
 module.exports = router;

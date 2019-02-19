@@ -165,3 +165,27 @@ exports.unfollowUser = (req, res) => {
     },
   );
 };
+
+exports.followersCount = (req, res) => {
+  UserModel.find({ following: [req.params.userId] })
+    .select('_id userImage name')
+    .exec()
+    .then(async (docs) => {
+      await UserModel.findById(req.params.userId, (errors, result) => {
+        if (result) {
+          res.status(200).json({
+            followers: docs,
+            following: result.following,
+          });
+        } else {
+          res.status(500).json({
+            message: 'An error occured, try again.',
+            errors,
+          });
+        }
+      });
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured, try again.' });
+    });
+};
