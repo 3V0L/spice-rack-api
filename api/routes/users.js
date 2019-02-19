@@ -10,8 +10,6 @@ router.post('/signup', UserController.signUp);
 
 router.post('/login', UserController.Login);
 
-router.delete('/remove/:userId', UserController.deleteUser);
-
 router.post('/userImage', checkAuth, imageUpload.single('userImage'), UserController.uploadImage);
 
 router.get('/users', checkAuth, UserController.getUsers);

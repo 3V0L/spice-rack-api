@@ -75,20 +75,6 @@ exports.Login = (req, res) => {
     });
 };
 
-exports.deleteUser = (req, res) => {
-  UserModel.remove({ _id: req.params.userId })
-    .exec()
-    .then((result) => {
-      result.status(200).json({ message: 'The User has been deleted' });
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: 'An error occured while deleting the user. Please try again.',
-        error,
-      });
-    });
-};
-
 exports.uploadImage = (req, res) => {
   UserModel.findByIdAndUpdate({ _id: req.userData.userId },
     { $set: { userImage: req.file.path } })

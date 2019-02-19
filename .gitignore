@@ -16,3 +16,5 @@ uploads/*
 
 # exception to the rule
 !uploads/placeholder.txt
+
+/coverage
