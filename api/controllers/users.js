@@ -88,3 +88,116 @@ exports.deleteUser = (req, res) => {
       });
     });
 };
+
+exports.uploadImage = (req, res) => {
+  UserModel.findByIdAndUpdate({ _id: req.userData.userId },
+    { $set: { userImage: req.file.path } })
+    .exec()
+    .then(() => {
+      res.status(200).json({ message: 'User Image Uploaded' });
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured, try again.' });
+    });
+};
+
+exports.getUsers = (req, res) => {
+  UserModel.find()
+    .select('_id name userImage')
+    .exec()
+    .then((results) => {
+      res.status(200).json({ count: results.length, results });
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured, try again.' });
+    });
+};
+
+exports.searchUsers = async (req, res) => {
+  const searchValues = await req.params.searchValue.split('+');
+  const response = [];
+  await searchValues.forEach((item) => {
+    response.push({ name: new RegExp(item, 'gi') });
+  });
+
+  UserModel.find({ $or: response })
+    .select('_id name userImage')
+    .exec()
+    .then((result) => {
+      if (result.length > 0) {
+        res.status(200).json({
+          totalCount: result.length,
+          result,
+        });
+      } else {
+        res.status(200).json({ message: 'No users available. Try other keywords' });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured while fetching data' });
+    });
+};
+
+exports.followUser = (req, res) => {
+  UserModel.update(
+    { _id: req.userData.userId },
+    { $addToSet: { following: req.params.userId } },
+    (errors, results) => {
+      if (results) {
+        res.status(200).json({ message: 'You are now following this user', results });
+      } else {
+        res.status(500).json({ message: 'An error occured, try again.', errors });
+      }
+    },
+  );
+};
+
+exports.unfollowUser = (req, res) => {
+  UserModel.update(
+    { _id: req.userData.userId },
+    { $pullAll: { following: [req.params.userId] } },
+    (errors, results) => {
+      if (results) {
+        res.status(200).json({ message: 'You unfollowed this user', results });
+      } else {
+        res.status(500).json({ message: 'An error occured, try again.', errors });
+      }
+    },
+  );
+};
+
+exports.followersCount = (req, res) => {
+  UserModel.find({ following: [req.params.userId] })
+    .select('_id userImage name')
+    .exec()
+    .then(async (docs) => {
+      await UserModel.findById(req.params.userId, (errors, result) => {
+        if (result) {
+          res.status(200).json({
+            followers: docs,
+            following: result.following,
+          });
+        } else {
+          res.status(500).json({
+            message: 'An error occured, try again.',
+            errors,
+          });
+        }
+      });
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured, try again.' });
+    });
+};
+
+exports.singleUser = (req, res) => {
+  UserModel.findById(req.params.userId)
+    .select('_id name userImage')
+    .exec()
+    .then((result) => {
+      res.status(200).json({ user: result });
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured, try again.' });
+    });
+};
