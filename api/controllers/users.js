@@ -189,3 +189,15 @@ exports.followersCount = (req, res) => {
       res.status(500).json({ message: 'An error occured, try again.' });
     });
 };
+
+exports.singleUser = (req, res) => {
+  UserModel.findById(req.params.userId)
+    .select('_id name userImage')
+    .exec()
+    .then((result) => {
+      res.status(200).json({ user: result });
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'An error occured, try again.' });
+    });
+};
