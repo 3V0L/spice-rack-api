@@ -17,4 +17,6 @@ uploads/*
 # exception to the rule
 !uploads/placeholder.txt
 
+# Testing outputs
 /coverage
+/.nyc_output
