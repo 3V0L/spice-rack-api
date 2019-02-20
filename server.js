@@ -4,7 +4,10 @@ const mongoose = require('mongoose');
 const debug = require('debug')('app');
 require('dotenv').config();
 
-mongoose.connect(process.env.DEV_DB, { useNewUrlParser: true });
+const config = require('./config');
+
+const environment = process.env.NODE_ENV || 'production';
+mongoose.connect(config[environment], { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 
 const app = require('./app');
@@ -15,3 +18,5 @@ const port = process.env.PORT || 3000;
 server.listen(port, () => {
   debug(`Server running on ${chalk.blue(`http://127.0.0.1:${port}`)}`);
 });
+
+module.exports = server;
