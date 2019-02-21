@@ -41,7 +41,6 @@ const recipeSchema = mongoose.Schema({
   },
   recipeImage: {
     type: String,
-    required: [true, 'An image of the recipe is required'],
   },
   public: {
     type: Boolean,
