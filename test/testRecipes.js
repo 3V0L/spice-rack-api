@@ -40,7 +40,7 @@ describe('Recipes', () => {
       .end(done);
   });
 
-  describe('Authorized Recipe Functions', () => {
+  describe('Personal Recipes', () => {
     let token;
     before((done) => {
       Recipes.remove({}, () => {
@@ -80,6 +80,42 @@ describe('Recipes', () => {
         .expect((res) => {
           expect(res.body).toHaveProperty('message');
           expect(res.body.message).toBe('Recipe Updated.');
+        })
+        .end(done);
+    });
+
+    it('A user should be able to retrieve all their recipes', (done) => {
+      request(app)
+        .get('/my-recipes')
+        .set('authorization', token)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('totalCount');
+          expect(res.body).toHaveProperty('recipes');
+        })
+        .end(done);
+    });
+
+    it('A user should be able to retrieve a single one of their recipes', (done) => {
+      request(app)
+        .get(`/my-recipes/${recipeFixtures.testUserRecipe._id}`)
+        .set('authorization', token)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.recipe._id).toBe(recipeFixtures.testUserRecipe._id);
+          expect(res.body).toHaveProperty('recipe');
+        })
+        .end(done);
+    });
+
+    it('A user should be able to delete their recipe', (done) => {
+      request(app)
+        .delete(`/my-recipes/${recipeFixtures.testUserRecipe._id}`)
+        .set('authorization', token)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('message');
+          expect(res.body.message).toBe('The recipe was deleted');
         })
         .end(done);
     });
