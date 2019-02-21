@@ -23,7 +23,7 @@ recipeFixtures.testUserRecipe = {
 
 recipeFixtures.addRecipe = {
   title: 'First',
-  ingredients: 'Teeskjsasa',
+  ingredients: 'Peas, Water, bread',
   time: 6,
   instructions: {
     1: 'Boil water',
@@ -32,6 +32,11 @@ recipeFixtures.addRecipe = {
   recipeImage: '',
   servings: 6,
   public: true,
+};
+
+recipeFixtures.rateRecipe = {
+  rating: 4,
+  comment: 'This is a test',
 };
 
 module.exports = recipeFixtures;

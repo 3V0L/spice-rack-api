@@ -40,7 +40,7 @@ describe('Recipes', () => {
       .end(done);
   });
 
-  describe('Personal Recipes', () => {
+  describe('Actions on Personal Recipes', () => {
     let token;
     before((done) => {
       Recipes.remove({}, () => {
@@ -116,6 +116,76 @@ describe('Recipes', () => {
         .expect((res) => {
           expect(res.body).toHaveProperty('message');
           expect(res.body.message).toBe('The recipe was deleted');
+        })
+        .end(done);
+    });
+  });
+
+  describe('Actions on Other Users Recipes', () => {
+    let token;
+    before((done) => {
+      Recipes.remove({}, () => {
+      });
+      const createRecipe = new Recipes(recipeFixtures.testUserRecipe);
+      createRecipe.save(() => {});
+      const createUser = new User(authFixtures.testUser);
+      createUser.save(() => {});
+      const createSecondUser = new User(authFixtures.secondTestUser);
+      createSecondUser.save(() => {});
+      request(app)
+        .post('/profile/login')
+        .send(authFixtures.secondTestUserLogin)
+        .end((err, res) => {
+          ({ token } = res.body);
+          done();
+        });
+    });
+
+    it('Retrieve another Users full recipe list', (done) => {
+      request(app)
+        .get(`/recipes/user/${authFixtures.testUser._id}`)
+        .set('authorization', token)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('totalCount');
+          expect(res.body.recipes.length).toBe(1);
+        })
+        .end(done);
+    });
+
+    it('Search for a recipe', (done) => {
+      request(app)
+        .get(`/recipes/search/ingredients/${recipeFixtures.testUserRecipe.ingredients.split(',')[0]}`)
+        .set('authorization', token)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('totalCount');
+          expect(res.body.recipes.length).toBe(1);
+        })
+        .end(done);
+    });
+
+    it('Search non-existent recipe', (done) => {
+      request(app)
+        .get('/recipes/search/ingredients/FakeValue')
+        .set('authorization', token)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('message');
+          expect(res.body.message).toBe('No recipes available. Try other keywords');
+        })
+        .end(done);
+    });
+
+    it('Rate a Recipe', (done) => {
+      request(app)
+        .post(`/recipes/review/${recipeFixtures.testUserRecipe._id}`)
+        .set('authorization', token)
+        .send(recipeFixtures.rateRecipe)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('message');
+          expect(res.body.message).toBe('Review Added');
         })
         .end(done);
     });
