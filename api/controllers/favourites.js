@@ -1,29 +1,43 @@
 const UserModel = require('../models/users');
 const recipeHelper = require('../helpers/recipeHelper');
+const RecipeModel = require('../models/recipes');
 
 
 exports.addFavourites = (req, res) => {
-  if (!recipeHelper.checkRecipeIsPublic(req, res)) {
-    res.status(403).json({ message: 'You are not allowed to perform this action' });
-  }
-  UserModel.updateOne(
-    { _id: req.userData.userId },
-    { $addToSet: { favourites: req.params.recipeId } },
-  )
+  RecipeModel.findById(req.params.recipeId)
+    .select('_id public recipeImage')
     .exec()
-    .then((response) => {
-      if (response.nModified === 0) {
-        res.status(409).json({
-          message: 'Recipe already in favourites',
-        });
+    .then((recipe) => {
+      if (recipe.public === false || recipe === null) {
+        return res.status(403).json({ message: 'You are not allowed to perform this action' });
+      // eslint-disable-next-line no-else-return
+      } else {
+        UserModel.updateOne(
+          { _id: req.userData.userId },
+          { $addToSet: { favourites: req.params.recipeId } },
+        )
+          .exec()
+          .then((response) => {
+            if (response.nModified === 0) {
+              res.status(409).json({
+                message: 'Recipe already in favourites',
+              });
+            }
+            const result = {
+              message: 'Recipe added to Favourites.',
+            };
+            res.status(200).json(result);
+          })
+          .catch(() => {
+            res.status(500).json({ error: 'Failed to add to Favourites.' });
+          });
       }
-      const result = {
-        message: 'Reipe added to Favourites.',
-      };
-      res.status(201).json(result);
     })
-    .catch(() => {
-      res.status(500).json({ error: 'Failed to add to Favourites.' });
+    .catch((error) => {
+      res.status(500).json({
+        message: 'An error occured while performing this action.',
+        error,
+      });
     });
 };
 
