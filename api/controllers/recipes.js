@@ -61,7 +61,7 @@ exports.addRecipe = (req, res) => {
     time: req.body.time,
     instructions: instructionsObj,
     servings: req.body.servings,
-    recipeImage: req.file.path,
+    recipeImage: req.file ? req.file.path : '',
     public: req.body.public,
   });
   recipe.save().then((result) => {

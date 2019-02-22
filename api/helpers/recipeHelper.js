@@ -24,23 +24,6 @@ recipeHelper.updateRecipe = (body, file) => {
   return updateObject;
 };
 
-recipeHelper.checkRecipeIsPublic = (req, res) => {
-  RecipeModel.findById(req.params.recipeId)
-    .select('_id public recipeImage')
-    .exec()
-    .then((recipe) => {
-      if (recipe.public === false || recipe === null) {
-        return false;
-      }
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: 'An error occured while performing this action.',
-        error,
-      });
-    });
-};
-
 recipeHelper.retrieveFavouriteRecipes = (req, res, recipeIds) => {
   RecipeModel.find({ _id: { $in: recipeIds } }, (err, recipes) => {
     if (err) {

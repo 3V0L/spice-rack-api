@@ -13,6 +13,8 @@ describe('Authentication', () => {
     User.remove({}, () => {
       done();
     });
+    const createUser = new User(authFixtures.testUser);
+    createUser.save(() => {});
   });
 
   it('User should be able to resgister', (done) => {
@@ -27,17 +29,14 @@ describe('Authentication', () => {
   });
 
   it('User should be able to login', (done) => {
-    const createUser = new User(authFixtures.testUser);
-    createUser.save(() => {
-      request(app)
-        .post('/profile/login')
-        .send(authFixtures.testUserLogin)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.message).toBe('User Logged In.');
-          expect(res.body).toHaveProperty('token');
-        })
-        .end(done);
-    });
+    request(app)
+      .post('/profile/login')
+      .send(authFixtures.testUserLogin)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.message).toBe('User Logged In.');
+        expect(res.body).toHaveProperty('token');
+      })
+      .end(done);
   });
 });

@@ -11,6 +11,8 @@ authFixtures.testUser = {
   name: 'test user',
   email: 'test@mail.com',
   password: '$2b$10$YUNaLhd.KU0JxqRZ4O.BzeuE9exMNrNiyGpJw5eSTh1ZlncR8ez5q',
+  favourites: [],
+  following: [],
 };
 
 authFixtures.testUserLogin = { email: 'test@mail.com', password: 'Test123' };
@@ -20,6 +22,8 @@ authFixtures.secondTestUser = {
   name: 'second user',
   email: 'second@mail.com',
   password: '$2b$10$2BdKZFJDiVvHGuPaMB/xzOAvLz9YEAocqQhghfRn4if5Yaw7reqWC',
+  favourites: [],
+  following: [],
 };
 
 authFixtures.secondTestUserLogin = {
