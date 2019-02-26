@@ -44,5 +44,8 @@
     "nodemon": "1.18.9",
     "nyc": "13.3.0",
     "supertest": "3.4.2"
+  },
+  "nyc": {
+    "exclude": "**/imageUpload.js" 
   }
 }
